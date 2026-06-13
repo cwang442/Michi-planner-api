@@ -1,0 +1,12 @@
+{
+  "name": "michi-planner-api",
+  "version": "1.0.0",
+  "description": "Card scanning API for Michi Method Planner",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
