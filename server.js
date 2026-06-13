@@ -100,18 +100,20 @@ const server = http.createServer(async (req, res) => {
       source: { type: "base64", media_type: img.mediaType || "image/jpeg", data: img.base64 }
     }));
 
-    const prompt = `You are identifying Pokémon TCG cards from an image. Extract every card you can see.
+    const prompt = `You are identifying Pokémon TCG cards from an image. The image could be anything — a collection app screenshot, a photo of physical cards, a binder page, or a single card image.
 
-For each card return:
-- name: the card name exactly as printed or displayed
-- set: the set or expansion name — look for it below the card name in app screenshots, or on the bottom of physical cards. ALWAYS include this if visible anywhere in the image.
-- rarity: the rarity type (Illustration Rare, Special Illustration Rare, Art Rare, Ultra Rare, Double Rare, Hyper Rare, Super Rare, ACE SPEC Rare, Promo, Rare, Common) — use empty string if not visible
-- price: price as a number string (e.g. "12.34") if shown, otherwise empty string
+For each card you can identify, extract:
+- name: the card name
+- set: the set or expansion name. IMPORTANT rules for finding it:
+  • In collection app screenshots: it appears on the line DIRECTLY below the card name, BEFORE the rarity line. Example: name="Mega Venusaur ex", then set="Mega Evolution", then rarity="Special Illustration Rare • 177/132"
+  • On physical cards: it appears at the bottom of the card
+  • NEVER use condition words as the set name. "Near Mint", "Lightly Played", "Moderately Played", "Holofoil", "Reverse Holofoil" are condition descriptions, NOT set names. Skip those lines entirely.
+  • Valid set names look like: "Mega Evolution", "Destined Rivals", "Perfect Order", "Journey Together", "Surging Sparks", "SV: 151", "Obsidian Flames", "Twilight Masquerade"
+- rarity: Illustration Rare / Special Illustration Rare / Art Rare / Ultra Rare / Double Rare / Hyper Rare / Super Rare / ACE SPEC Rare / Promo / Rare / Common — empty string if not visible
+- price: price as a number string (e.g. "256.92") if shown, otherwise empty string
 
 Return ONLY a valid JSON array, no markdown:
-[{"name":"...","set":"...","rarity":"...","price":"..."}]
-
-Read every card visible. For each one, carefully look for and include the set name — it is always somewhere in the image for app screenshots, and on the card itself for physical card photos.`;
+[{"name":"...","set":"...","rarity":"...","price":"..."}]`;
 
     const payload = {
       model: "claude-sonnet-4-5",
