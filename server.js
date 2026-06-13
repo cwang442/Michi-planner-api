@@ -100,17 +100,16 @@ const server = http.createServer(async (req, res) => {
       source: { type: "base64", media_type: img.mediaType || "image/jpeg", data: img.base64 }
     }));
 
-    const prompt = `You are identifying Pokémon TCG cards from an image. The image could be anything — a collection app screenshot, a photo of physical cards, a binder page, or a single card image.
+    const prompt = `You are reading text from an image containing Pokémon TCG cards. Read only what is literally visible in the image — do NOT use your knowledge of Pokémon cards to guess or fill in any fields.
 
-For each card you can identify, extract:
-- name: the card name
-- set: the set or expansion name. IMPORTANT rules for finding it:
-  • In collection app screenshots: it appears on the line DIRECTLY below the card name, BEFORE the rarity line. Example: name="Mega Venusaur ex", then set="Mega Evolution", then rarity="Special Illustration Rare • 177/132"
-  • On physical cards: it appears at the bottom of the card
-  • NEVER use condition words as the set name. "Near Mint", "Lightly Played", "Moderately Played", "Holofoil", "Reverse Holofoil" are condition descriptions, NOT set names. Skip those lines entirely.
-  • Valid set names look like: "Mega Evolution", "Destined Rivals", "Perfect Order", "Journey Together", "Surging Sparks", "SV: 151", "Obsidian Flames", "Twilight Masquerade"
-- rarity: Illustration Rare / Special Illustration Rare / Art Rare / Ultra Rare / Double Rare / Hyper Rare / Super Rare / ACE SPEC Rare / Promo / Rare / Common — empty string if not visible
-- price: price as a number string (e.g. "256.92") if shown, otherwise empty string
+For each card visible, extract:
+- name: the card name as printed
+- set: the set name as printed in the image. In app screenshots it appears on the line directly below the card name, before the rarity line. On physical cards and binder photos it appears at the bottom edge of the card. If the set name is not clearly readable in the image, use empty string. NEVER guess or infer the set from your knowledge of the card.
+- rarity: only if clearly printed (Illustration Rare, Special Illustration Rare, Art Rare, Ultra Rare, Double Rare, Hyper Rare, Super Rare, ACE SPEC Rare, Promo, Rare, Common) — empty string if not visible
+- price: number string if shown (e.g. "256.92"), empty string if not shown
+
+CRITICAL: The set field must contain ONLY text visible in the image. Never use "XY", "Team Rocket Returns", "Roaring Skies", "Gym Heroes", "Base Set", "Jungle", or any set name you infer from knowing the card — only what is printed in this specific image.
+Condition words like "Near Mint", "Lightly Played", "Holofoil" are never set names.
 
 Return ONLY a valid JSON array, no markdown:
 [{"name":"...","set":"...","rarity":"...","price":"..."}]`;
