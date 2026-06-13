@@ -100,26 +100,18 @@ const server = http.createServer(async (req, res) => {
       source: { type: "base64", media_type: img.mediaType || "image/jpeg", data: img.base64 }
     }));
 
-    const prompt = `You are identifying Pokémon TCG cards from an image. The image could be any of these:
+    const prompt = `You are identifying Pokémon TCG cards from an image. Extract every card you can see.
 
-1. A COLLECTR APP SCREENSHOT — shows a grid of cards with text below each one showing name, set, rarity, and CAD price. Read the text labels below each card image, not the card art itself. Extract every card visible.
+For each card return:
+- name: the card name exactly as printed or displayed
+- set: the set or expansion name — look for it below the card name in app screenshots, or on the bottom of physical cards. ALWAYS include this if visible anywhere in the image.
+- rarity: the rarity type (Illustration Rare, Special Illustration Rare, Art Rare, Ultra Rare, Double Rare, Hyper Rare, Super Rare, ACE SPEC Rare, Promo, Rare, Common) — use empty string if not visible
+- price: price as a number string (e.g. "12.34") if shown, otherwise empty string
 
-2. A PHOTO OF A PHYSICAL CARD or cards — read the card name printed on the card, identify the set and rarity from the card design if visible.
+Return ONLY a valid JSON array, no markdown:
+[{"name":"...","set":"...","rarity":"...","price":"..."}]
 
-3. A BINDER PAGE PHOTO — extract each card you can identify from the card art and any visible text.
-
-4. A SINGLE CARD IMAGE — identify the one card shown.
-
-For each card you can identify, extract:
-- name: the card name (e.g. "Cleffa", "Team Rocket's Giovanni", "N's Zoroark ex")
-- set: the set name if visible (e.g. "Destined Rivals", "SV: 151", "Perfect Order")
-- rarity: the rarity if visible (Illustration Rare, Special Illustration Rare, Art Rare, Ultra Rare, Double Rare, Hyper Rare, Super Rare, ACE SPEC Rare, Promo, Rare, Common)
-- price: CAD price as a number string if shown (e.g. "12.34"), otherwise empty string
-
-Return ONLY a valid JSON array, no markdown, no explanation:
-[{"name":"","set":"","rarity":"","price":""}]
-
-Use empty string for any field not clearly visible. Return at least one entry even if you can only partially identify a card.`;
+Read every card visible. For each one, carefully look for and include the set name — it is always somewhere in the image for app screenshots, and on the card itself for physical card photos.`;
 
     const payload = {
       model: "claude-sonnet-4-5",
