@@ -100,19 +100,15 @@ const server = http.createServer(async (req, res) => {
       source: { type: "base64", media_type: img.mediaType || "image/jpeg", data: img.base64 }
     }));
 
-    const prompt = `Identify every Pokémon TCG card visible in this image. The image may be anything: a screenshot from a collection app, a photo of physical cards, a binder page, a single card, or a card listing from any website or app.
+    const prompt = `Identify every Pokémon TCG card visible in this image.
 
-For each card return these four fields:
+For each card return:
+- name: the card name as printed
+- set: the set name as it appears in this image. IMPORTANT: The set shown may be a reprint, regional release, or new product that differs from what you know about this card. Read the text in the image — do not substitute from your training knowledge.
+- rarity: the rarity if clearly visible (e.g. "Illustration Rare", "Special Illustration Rare", "Art Rare", "Ultra Rare", "Double Rare", "Super Rare", "Promo", "Rare") — empty string if not visible
+- price: the price number if shown (e.g. "10.55") — empty string if not shown
 
-name: The card's name as it appears on the card itself — words like "Psyduck", "Team Rocket's Giovanni", "N's Zoroark ex", "Eevee", "Mega Venusaur ex". Short and clean. No extra descriptions, no brackets, no product info.
-
-set: The expansion or set the card is from. Look for it wherever it appears — printed on the card, shown in the app UI, listed below the card name, or visible anywhere in the image. Valid examples: "Destined Rivals", "Journey Together", "SV: 151", "Paradox Rift", "Twilight Masquerade", "Obsidian Flames", "Surging Sparks", "Shrouded Fable", "Mega Evolution", "Perfect Order". If you cannot find the set name anywhere in the image return empty string — never guess.
-
-rarity: The rarity if shown anywhere in the image. One of: Illustration Rare, Special Illustration Rare, Art Rare, Ultra Rare, Double Rare, Hyper Rare, Super Rare, ACE SPEC Rare, Promo, Rare, Common. Empty string if not visible.
-
-price: Any price shown for the card as a number string like "44.56". Empty string if no price is shown.
-
-Return ONLY a valid JSON array with no markdown, no explanation:
+Return ONLY a JSON array, no markdown:
 [{"name":"","set":"","rarity":"","price":""}]`;
 
     const payload = {
